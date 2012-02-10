@@ -1,5 +1,4 @@
-欢迎大家使用kpagescom js开发构架，此开发架构基于jquery,提交的功能详见 *api.txt
-
-mail: comger@gmail.com,kpages@163.com
-github: https://github.com/comger/kpagescom
+欢迎大家使用comger.js html5 canvas 开发你喜欢的东西;comger.js 会帮助你更快的完成canvas 交互编程。
+mail: comger@gmail.com
+github: https://github.com/comger/canvas5
 
