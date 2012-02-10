@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>comger.js api rect demo</title>
+    <script src="../jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script src="../comger.js"></script>
+    <style>
+    .wrap{ width:1000px; margin:10px auto;text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <canvas id="canvas"></canvas>
+    </div>
+</body>
+</html>
+<script>
+/**
+    PointLine
+**/
+var PointLine = Class(Comger.Rect,{
+    model:undefined,
+    init:function(opts,model,canvasLayer){
+        this.__init__(opts,canvasLayer);
+        this.model = model;
+        
+        var vals = [];
+        $(this.model).each(function(i){
+            vals.push(parseInt(this.value));
+        });
+        
+        this.vals = vals;
+        
+        this.maxVal = Math.max.apply(Math,vals);
+        this.minVal = Math.min.apply(Math,vals);
+        this.space = this.maxVal;
+        this.sub = this.height/this.space;
+        
+    },
+    render:function(){
+
+        var model = this.model;
+        var ctx = this.context;
+        var self = this;
+        ctx.save();
+        this.__parentClass.prototype.render.bind(this)();
+        ctx.restore();
+        
+        ctx.strokeStyle = "red";
+        
+        var offsetLeft = self.x;
+        
+        ctx.beginPath();
+        
+        var xstep = self.width / self.model.length;
+        
+        ctx.moveTo(offsetLeft,self.height);
+        $(this.model).each(function(i){
+            var offsetTop = self.height - parseInt(this.value)*self.sub + self.y;
+            offsetLeft += xstep;
+            ctx.lineTo(offsetLeft,offsetTop);
+            ctx.stroke(); 
+        })
+
+        
+        ctx.font = "10pt Calibri";  
+        ctx.textBaseline = "middle";  
+        ctx.fillStyle = "blue";  
+
+        offsetLeft = self.x;
+        $(this.model).each(function(i){
+            var offsetTop = self.height - parseInt(this.value)*self.sub +self.y ;
+            offsetLeft += xstep;
+            ctx.moveTo(offsetLeft,offsetTop);
+            ctx.arc(offsetLeft,offsetTop,2,0,Math.PI*2,true);
+            ctx.stroke(); 
+            ctx.fillText(this.value,offsetLeft+5,offsetTop+2)
+            
+            
+            ctx.fillText(this.label,offsetLeft,self.y+self.height+10);
+        })
+        
+        
+        var offsetTop =  self.y + self.height;
+        var ystep = offsetTop/self.model.length;
+        var yval = 0;
+        var vstep = this.maxVal/self.model.length;
+        $(this.vals.sort()).each(function(i){
+            offsetTop = offsetTop - ystep;
+            yval = yval+vstep;
+            if(i==0){
+                offsetTop +=ystep;
+                yval -=vstep;
+            }
+            ctx.fillText(Math.floor(yval),self.x-20,offsetTop);
+        })
+
+        
+    },
+    max:function(){
+        var vals = [];
+        $(this.model).each(function(i){
+            vals.push(parseInt(this.value));
+        });
+        return vals.max();
+        
+    }
+})
+
+$(function(){
+    var canvasLayer = new Comger.CanvasLayer("#canvas");
+      var model = [
+        {
+            "label": "Jan",
+            "value": "34"
+        },
+        {
+            "label": "Feb",
+            "value": "44"
+        },
+        {
+            "label": "Mar",
+            "value": "48"
+        },
+        {
+            "label": "Apr",
+            "value": "54"
+        },
+        {
+            "label": "May",
+            "value": "60"
+        },
+        {
+            "label": "Jun",
+            "value": "70"
+        },
+        {
+            "label": "Jul",
+            "value": "58"
+        },
+        {
+            "label": "Aug",
+            "value": "62"
+        },
+        {
+            "label": "Sep",
+            "value": "54"
+        },
+        {
+            "label": "Oct",
+            "value": "45"
+        },
+        {
+            "label": "Nov",
+            "value": "39"
+        },
+        {
+            "label": "Dec",
+            "value": "23"
+        }
+    ];
+    
+    
+    var pl = new PointLine({
+        x:300,
+        y:10,
+        width:450,
+        height:300,
+        radius:5,
+        isFill:true,
+        styles:{
+            lineWidth:1,
+            fillStyle:"#F5F5F5"
+        }
+    },model);
+
+    
+    canvasLayer.autoDraw();
+})
+</script>
+
+
