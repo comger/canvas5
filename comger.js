@@ -194,7 +194,7 @@ Comger.Item = Class({
         self.mouseover((function(e){
             $(tips).css("top",this.y-10+ this.offset.top + 'px');
             $(tips).css("left", this.x +10 + this.offset.left+ 'px');
-            $(tips).html(self.tips);
+            $(tips).html(this.tips);
             tips.show();
         }).bind(self))
 
