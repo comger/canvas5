@@ -3,6 +3,7 @@
 <head>
     <title>Html5 Canvas uml5</title>
     <meta charset="utf-8">
+
     <style>
     .wrap{ width:1000px; margin:10px auto;text-align: left; }
     h3{ color:red;}
@@ -30,7 +31,24 @@
       <div class="item"><a href="demo/charts.html">曲线图 demo</a></div></br>
       <div class="item"><a href="demo/fences.html">多边形 demo</a></div></br>
       <div class="item"><a href="demo/cube.html">立方体 demo</a></div></br>
+      <div class="item"><a href="demo/arc.html">圆形 demo</a></div></br>
       <div class="item"><a href="demo/cylinder.html">圆柱体 demo</a></div></br>
+      <pre>
+            /**
+                所有图形都支持 click, mouseover, mouseout等事件
+            **/
+            gra.click(function(){
+                console.log("gra click");
+            })
+            
+            gra.mouseover(function(){
+                console.log("gra mouseover");
+            })
+            
+            gra.mouseout(function(){
+                console.log("gra mouseout");
+            })
+      </pre>
     </div>
     <div class="footer">
       get the source code on GitHub : <a href="https://github.com/comger/canvas5">comger/canvas5</a>
