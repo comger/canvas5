@@ -554,18 +554,49 @@ Comger.Fences = Class(Comger.Item,{
         
         if(this.isFill){ //填充还是勾边
             ctx.fill();
-            
         }else{
             ctx.stroke();
-            
-       }
-       ctx.closePath();
+        }
+        ctx.closePath();
     },
     inrange:function(m){
         return Uti.inFences(m,this.points);
     }
 })
 
+/**
+    圆形
+    opts={
+        x:100,圆点x坐标
+        y:100, 圆点y坐标
+        r:50,半径
+        w：0
+    }
+    
+**/
+Comger.Arc = Class(Comger.Item,{
+    init:function(opts,canvasLayer){  
+        this.__init__(opts,canvasLayer);
+    },
+    inrange:function(m){//需要支持Mouse、Click 等事件时，此方法必须实现
+        var dis = Uti.getPointsDis(m,{x:this.x,y:this.y});
+        return dis<=this.r
+    },
+    render:function(context){//todo 不以 x,y 为圆点；以x+r,y 为圆点  ？？ 
+        var ctx = context || this.context
+        var o = this;
+        ctx.beginPath();
+        ctx.moveTo(o.x,o.y);
+        ctx.arc(o.x,o.y,o.r,0,Math.PI*2,true);
+        if(this.isFill){ //填充还是勾边
+            ctx.fill();
+        }else{
+            ctx.stroke();
+        }
+        ctx.closePath();
+
+    }
+})
 
 
 
