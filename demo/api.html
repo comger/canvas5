@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>comger.js api</title>
+    <meta charset="utf-8">
+    <style>
+    .wrap{ width:1000px; margin:10px auto;text-align: left; }
+    h3{ color:red;}
+    .box { padding:5px; margin-bottom:10px;  }
+    .item{padding-left:12px;}
+    pre {     background: none repeat scroll 0 0 #F5F5F5;
+    border: 1px dotted #778855;
+    font-family: "Courier New",monospace;
+    font-size: 12px;
+    margin: 10px 0 0;
+    padding: 10px;
+    width: 800px; line-height:24px;}
+    .test{ padding:5px;}
+    .footer { text-align:center; padding-top:30px; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="box">
+
+            <h3>Comger 对象通用api</h3>
+                <h4>基础图型约束类 Comger.Item</h4>
+                <p>从此类继承出来的图形具有 mouseover,mouseout,mousedown,mouseup,click 等事件，支持对图形操作</p>
+                <pre>
+    //事件添加方法
+    var rect = Comger.Rect({...})
+    rect.mouseover(function(e){
+        //todo
+    })
+    
+    rect.mouseout(function(e){
+        //todo
+    })
+    
+    rect.click(function(e)){
+        //todo
+    }
+    
+    
+                </pre>
+              
+                <div class="item">
+                    <h4>图形类库清单</h4>
+                   
+                </div>
+ <pre>
+    //矩型 Comger.Rect
+    opts= {
+        x,
+        y,
+        w,
+        h,
+        styles:{
+            fillStyle,
+            strokeStyle,
+            lineWidth
+        }
+    }
+
+
+
+    //圆型 Comger.Arc
+    opts={
+        x:100,圆点x坐标
+        y:100, 圆点y坐标
+        r:50半径
+    }
+    
+    
+
+    //多边型 Comger.Fences
+    opts = {
+        points:[]
+        style,
+        fill
+    }
+
+
+
+    //立方体 Comger.Cube
+    opts = {
+        x,
+        y,
+        w,
+        h,
+        v, //立方向量
+        color,
+        styles:{
+        }
+    }
+
+     //圆柱体 Comger.Cylinder
+     opts = {
+        x,
+        y,
+        r,
+        h,
+        color,
+        styles:{
+        }
+    }
+                    </pre>
+        </div>
+    </div>
+    <div class="footer">
+      get the source code on GitHub : <a href="https://github.com/comger/canvas5">comger/canvas5</a>
+    </div>
+</body>
+</html>
+
+

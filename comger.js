@@ -126,6 +126,7 @@ Comger.Utility = {
     }
 };
 
+window.Ga = Comger;
 window.Uti = Comger.Utility;
 
 /**
@@ -275,10 +276,10 @@ Comger.Item = Class({
         this.visible = true;
     },
     hide:function(){
-        
+        this.visible = false;
     },
     setEnabled:function(flag){
-        
+        //todo del events
     },
     setToolTips:function(text){
         var tips = $("#canvas_tips");
@@ -307,7 +308,7 @@ Comger.Item = Class({
         return this.x<=point.x && point.x<=(this.x+this.width) && this.y <= point.y && point.y<= (this.y+this.height)
     },
     resize:function(){
-        
+        //todo
     },
     setDragEnabled:function(flag){
         this.dragActive = flag || this.dragActive;
@@ -511,6 +512,7 @@ Comger.Rect = Class(Comger.Item,{
         }else{
             this.context.stroke();
         }
+        
     },
     line:function(p1,p2){
 	    this.context.beginPath();
