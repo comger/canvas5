@@ -233,3 +233,39 @@ Comger.PointLine = Class(Comger.Rect,{
         
     }
 })
+
+/**
+ * 多线条表图
+ * http://www.fusioncharts.com/demos/gallery/line-and-area/chart.asp?id=msline_3
+**/
+Comger.MutiLineCharts = Class(Comger.Rect,{
+    init:function(opts,model,canvasLayer){
+        this.__init__(opts,canvasLayer);
+        this.model = model;
+       
+    },
+    render:function(ctx){
+        var ctx = this.context;
+        var self = this;
+        ctx.save();
+        this.__parentClass.prototype.render.bind(this)();
+        ctx.restore();e
+        
+        ctx.font = "20pt Calibri";  
+        ctx.textBaseline = "top";  
+        ctx.textAlign = "start"; 
+        ctx.fillStyle = "blue";  
+        var caption = self.model.caption;
+        ctx.fillText(caption,this.centerX(ctx,caption),self.y+20);
+        
+        //ctx.fillText(self.model.yaxisname,self.x,+self.y);
+        ctx.strokeRect(self.x+40,self.y+50,self.width-self.x-40,self.height-80);
+        
+
+        
+    },
+    centerX:function(ctx,str){
+    	var metrics = ctx.measureText(str);
+    	return this.x+this.width/2-metrics.width/2;
+    }
+})
