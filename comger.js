@@ -22,10 +22,12 @@ window.Class = Comger.Class = function(a,b){
         }else{
             $.extend(_obj.prototype,a);
         }
-        
         return _obj;
     })());
     
+    cls.prototype.subclass(obj){
+        obj.init();
+    }
     return cls;
 };
 
