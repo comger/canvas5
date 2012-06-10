@@ -25,7 +25,7 @@ window.Class = Comger.Class = function(a,b){
         return _obj;
     })());
     
-    cls.prototype.subclass(obj){
+    cls.prototype.subclass = function(obj){
         obj.init();
     }
     return cls;

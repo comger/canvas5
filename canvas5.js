@@ -20,7 +20,7 @@
  * 1. 以第一次点击画板的坐标做为此次图形的x,y。
  * 2. 支持缩放与移动、颜色
 **/
-var Ui_interface = Class({
+var UI = Class({
    x:0,
    y:0,
    z:0,
@@ -39,3 +39,26 @@ var state = {
     drawing:2,//正在绘制
     completed:3//绘制完成
 }
+
+var Layout = Class({
+    canvas:undefined,
+    init:function(w,h)
+})
+
+var LayoutMaster = Class({
+    layouts:[],
+    curLayout:undefined,
+    init:function(){
+        //TODO   
+    },
+    add:function(ui){
+        var layout = ui;
+        if(layout){
+            $(".op_area").append($(ui.canvas));
+            layouts.push(ui);
+            return layout;
+        }
+        
+
+    }
+})

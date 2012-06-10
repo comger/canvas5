@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>comger.js api rect demo</title>
+    <meta charset="utf-8">
+    <script src="../jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script src="../comger.js"></script>
+    <style>
+    .wrap{ width:1000px; margin:10px auto;text-align: left; }
+    .footer { text-align:center; padding-top:30px; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <canvas id="canvas" width='800' height='600' style="border:1px solid #cccccc"></canvas>
+    </div>
+    <div class="footer">
+      get the source code on GitHub : <a href="https://github.com/comger/canvas5">comger/canvas5</a>
+    </div>
+</body>
+</html>
+<script>
+$(function(){
+     var canvas = $("#canvas");
+     var context = canvas[0].getContext('2d');
+     var m = undefined;
+     var linewidth = 5;
+     
+     canvas.mousedown(function(e){
+            m  = getCurPoint(e);
+            context.beginPath();
+            context.moveTo(m.x,m.y);
+     });
+     
+     canvas.mousemove(function(e){
+            if(m){
+                
+                var c  = getCurPoint(e);
+                clear();
+                //context.strokeRect(m.x,m.y, c.x-m.x,c.y-m.y);
+                drawdashrect(m,c);
+            }
+
+     });
+     
+     canvas.mouseup(function(e){
+            //context.stroke();
+            m = undefined;
+     })
+     
+     
+     function clear(){
+    	    context.setTransform(1, 0, 0, 1, 0, 0);//?? 关键
+        context.clearRect(0, 0, canvas.width(), canvas.height());
+     }
+     
+    function drawdashrect(from,to){
+           drawdashline(from,to,true);
+           drawdashline(from,to,false);
+           drawdashline(to,from,true);
+           drawdashline(to,from,false);
+    }
+
+    function drawdashline(from,to,flag){
+           var npointx;
+            var bar = 1;
+           if(flag){
+               var w = to.x - from.x
+                if(w<0){
+                    bar = -bar;
+                }
+               npointx = from.x;
+               w = getBigInt(w);
+               
+               for(var i=0;i<w/linewidth;i++){
+                    context.beginPath();
+                    context.moveTo(npointx,from.y);
+                    context.lineTo(npointx+linewidth*bar-2*bar,from.y);
+                    context.stroke();
+                    npointx = npointx +linewidth*bar;
+               }
+           }else{
+               var w = to.y - from.y;
+               if(w<0){
+                    bar = -bar;
+                }
+               npointx = from.y;
+               w = getBigInt(w);     
+               for(var i=0;i<w/linewidth;i++){
+                    context.beginPath();
+                    context.moveTo(from.x,npointx);
+                    context.lineTo(from.x, npointx+bar*linewidth-bar*2);
+                    context.stroke();
+                    npointx = npointx +bar*linewidth;
+               }
+           }
+     }
+
+     function getBigInt(i){
+        if(i<0){
+            i = -i;
+        }
+        return i;
+    }
+     
+    function getCurPoint(e){
+        var _offset = canvas.offset();
+    	    return { x:(e.clientX + window.pageXOffset-_offset.left), y:(e.clientY + window.pageYOffset-_offset.top)};
+    }
+})
+</script>
