@@ -15,6 +15,14 @@
  * @addon 2012-05-29
 **/
 
+//图型状态值
+var state = {
+    init:0, //初始状态
+    ready:1,//准备就绪
+    drawing:2,//正在绘制
+    completed:3//绘制完成
+}
+
 /**
  * 平面UI接口
  * 1. 以第一次点击画板的坐标做为此次图形的x,y。
@@ -32,10 +40,19 @@ var Ui_interface = Class({
    state:"ready"
 });
 
-//图型状态值
-var state = {
-    init:0, //初始状态
-    ready:1,//准备就绪
-    drawing:2,//正在绘制
-    completed:3//绘制完成
-}
+/**
+ * 图层类,接受至少一个的图形、线条、或文字
+ * 每一个图层为一个Canvas 实例
+ * 图层记录着图形信息
+ * 图层可以合并
+**/
+var Layout = Class({
+    context:undefined,
+    canvas:undefined,
+    graphics:[],
+    init:function(exp,ui){
+        this.canvas = $(exp);
+    }
+})
+
+
