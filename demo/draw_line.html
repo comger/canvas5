@@ -26,18 +26,91 @@ $(function(){
      var m = undefined;
      var linewidth = 6;
      
+     
+    var CP = window.CanvasRenderingContext2D && CanvasRenderingContext2D.prototype;
+    if (CP && CP.lineTo){
+      CP.dashedLine = function(x,y,x2,y2,dashArray){
+        if (!dashArray) dashArray=[10,5];
+        if (dashLength==0) dashLength = 0.001; // Hack for Safari
+        var dashCount = dashArray.length;
+        this.moveTo(x, y);
+        var dx = (x2-x), dy = (y2-y);
+        var slope = dy/dx;
+        var distRemaining = Math.sqrt( dx*dx + dy*dy );
+        var dashIndex=0, draw=true;
+        while (distRemaining>=0.1){
+          var dashLength = dashArray[dashIndex++%dashCount];
+          if (dashLength > distRemaining) dashLength = distRemaining;
+          var xStep = Math.sqrt( dashLength*dashLength / (1 + slope*slope) );
+          x += xStep
+          y += slope*xStep;
+          this[draw ? 'lineTo' : 'moveTo'](x,y);
+          distRemaining -= dashLength;
+          draw = !draw;
+        }
+      }
+    }
+    
+    
+    var __dashedLineFromTo = {
+      isDrawing : true,
+      unFinishedPixelsFromLastDash : 0
+    }
+    
+    CanvasRenderingContext2D.prototype.dashedLineFromTo = function(from,to) {
+      var x=from[0], y=from[1],
+          dashLength        = 2,
+          dx                = (to[0] - x) + .00000001,
+          dy                = to[1] - y,
+          slope             = dy/dx,
+          distanceRemaining = Math.sqrt(dx*dx + dy*dy),
+          bUnfinishedPixels = false,
+          theDashLength,
+          xStep;
+      this.moveTo(x,y);
+      while (distanceRemaining>=0.1) {
+        if (__dashedLineFromTo.unFinishedPixelsFromLastDash === 0) {
+          theDashLength = dashLength;
+        } else {
+          theDashLength = __dashedLineFromTo.unFinishedPixelsFromLastDash;
+          __dashedLineFromTo.unFinishedPixelsFromLastDash = 0;
+          __dashedLineFromTo.isDrawing = !__dashedLineFromTo.isDrawing
+        }
+        if (dashLength > distanceRemaining) { dashLength = distanceRemaining; bUnfinishedPixels=true; }
+        xStep = Math.sqrt( theDashLength*theDashLength / (1 + slope*slope) );
+        x += xStep;
+        y += slope*xStep;
+        this[__dashedLineFromTo.isDrawing ? 'lineTo' : 'moveTo'](x,y);
+        distanceRemaining -= theDashLength;
+        __dashedLineFromTo.isDrawing = !__dashedLineFromTo.isDrawing;
+      }
+      if (bUnfinishedPixels) {
+        __dashedLineFromTo.unFinishedPixelsFromLastDash = theDashLength;
+      }
+    }
+     
      canvas.mousedown(function(e){
             m  = getCurPoint(e);
-            //context.beginPath();
+            context.beginPath();
+            context.lineWidth = 2;
+            context.lineCap = 'butt';
             //context.moveTo(m.x,m.y);
      });
      
      canvas.mousemove(function(e){
             if(m){
+                clear();
                 var c  = getCurPoint(e);
                 //context.lineTo(m.x,m.y);
                 //context.stroke();
-                drawdashline(m,c,false);
+                //context.lineCap = "round";
+                //context.lineWidth = 1;
+                context.dashedLine(m.x,m.y,c.x,c.y,[30,10,0,10]);
+                //drawdashline(m,c,false);
+                
+                //context.dashedLineFromTo([m.x,m.y],[c.x,c.y]);
+                //context.closePath();
+                //context.stroke();
             }
 
      });
@@ -88,6 +161,11 @@ $(function(){
         }
         return i;
     }
+     
+     function clear(){
+    	context.setTransform(1, 0, 0, 1, 0, 0);//?? 关键
+        context.clearRect(0, 0, canvas.width(), canvas.height());
+     }
      
     function getCurPoint(e){
         var _offset = canvas.offset();
