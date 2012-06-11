@@ -72,7 +72,7 @@ $(function(){
     M = undefined; //初始坐标
     NPoint = undefined;
     var linewidth = 5;
-    
+    ui = undefined;
    
     Main.mousedown(function(e){
         M = getCurPoint(e);
@@ -80,35 +80,52 @@ $(function(){
         context.moveTo(M.x,M.y);
     });
     
+    
     Main.mousemove(function(e){
         if(M){
             NPoint = getCurPoint(e);
             switch(op_select){
                 case 'SelectArea':
-                    clear();
-                    drawdashrect(M,NPoint);
+                    context.clear();
+                    context.dashRect(M,NPoint);
                     break;
                 case 'DrawLine':
-                    context.lineTo(NPoint.x,NPoint.y);
-                    context.stroke();
+                    context.clear();
+                    ui = new ULine({
+                        from:M,
+                        to:NPoint,
+                        context:context
+                    });
+                    ui.drawing();
                     break;
                 case 'DrawRect':
-                    clear();
-                    drawdashrect(M,NPoint);
+                    context.clear();
+                    ui = new URect({
+                        from:M,
+                        to:NPoint,
+                        context:context,
+                        isFill:true
+                    });
+                    ui.drawing();
                     break;
                 case 'StrokeRect':
-                    clear();
-                    drawdashrect(M,NPoint);
+                   context.clear();
+                    ui = new URect({
+                        from:M,
+                        to:NPoint,
+                        context:context,
+                        isFill:false
+                    });
+                    ui.drawing();
                     break;
                 case 'DrawArc':
-                    clear();
+                    context.clear();
                     context.beginPath();
                     context.moveTo(M.x,M.y);
                     context.arc(M.x,M.y,Comger.Utility.getPointsDis(M,NPoint),0,Math.PI*2,true);
                     context.stroke();
                     context.closePath();
                     break;
-                    
             }
         }
 
@@ -118,19 +135,20 @@ $(function(){
     Main.mouseup(function(e){
         switch(op_select){
             case 'SelectArea':
+                changeCanvas(Cbox);
                 break;
             case 'DrawLine':
                 changeCanvas(Cbox);
-                context.lineTo(NPoint.x,NPoint.y);
-                context.stroke();
+                ui.draw();
+                //context.lineTo(NPoint.x,NPoint.y);
                 break;
             case 'DrawRect':
                 changeCanvas(Cbox);
-                context.fillRect(M.x,M.y, NPoint.x-M.x,NPoint.y-M.y);
+                ui.draw();
                 break;
             case 'StrokeRect':
                 changeCanvas(Cbox);
-                context.strokeRect(M.x,M.y, NPoint.x-M.x,NPoint.y-M.y);
+                ui.draw();
                 break;
             case 'DrawArc':
                 changeCanvas(Cbox);
@@ -150,6 +168,8 @@ $(function(){
     function changeCanvas(obj){
         canvas = obj;
         context = canvas[0].getContext('2d');
+        if(ui)
+            ui.getOpt().context = context;
     }
    
     //清除屏幕
