@@ -78,9 +78,10 @@ $(function(){
    
     Main.mousedown(function(e){
         M = getCurPoint(e);
-        if(op_select=="SelectTool" && ui && ui.clear){
+        if(op_select=="SelectTool"){
             ui = findUI(M);
-            ui.clear();
+            if(ui) 
+                ui.clear();
         }
         
         changeCanvas(Ctemp);
@@ -137,8 +138,11 @@ $(function(){
                     ui.drawing();
                     break; 
                 case 'SelectTool':
-                    context.clear();
-                    ui.move(NPoint);
+                    if(ui && ui.move){
+                        context.clear();
+                        ui.move(NPoint);
+                    }
+                    
                     break;
             }
         }
@@ -173,7 +177,8 @@ $(function(){
                 break;
             case 'SelectTool':
                 changeCanvas(Cbox);
-                ui.draw();
+                if(ui)
+                    ui.draw();
                 break;
                 
         }
