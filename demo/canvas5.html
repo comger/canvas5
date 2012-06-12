@@ -32,7 +32,8 @@
         <div class="left">
             <h2>工具栏</h2>
             <ul>
-                <li val="SelectArea" class='hover'>选区</li>
+                <li val="SelectTool" class='hover'>选择</li>
+                <li val="SelectArea">选区</li>
                 <li val="DrawLine">画线</li>
                 <li val="DrawRect">矩形</li>
                 <li val="StrokeRect">边框</li>
@@ -73,11 +74,18 @@ $(function(){
     NPoint = undefined;
     var linewidth = 5;
     ui = undefined;
+    uiList = [];
    
     Main.mousedown(function(e){
         M = getCurPoint(e);
+        if(op_select=="SelectTool" && ui && ui.clear){
+            ui = findUI(M);
+            ui.clear();
+        }
+        
         changeCanvas(Ctemp);
         context.moveTo(M.x,M.y);
+        
     });
     
     
@@ -120,11 +128,17 @@ $(function(){
                     break;
                 case 'DrawArc':
                     context.clear();
-                    context.beginPath();
-                    context.moveTo(M.x,M.y);
-                    context.arc(M.x,M.y,Comger.Utility.getPointsDis(M,NPoint),0,Math.PI*2,true);
-                    context.stroke();
-                    context.closePath();
+                    ui = new UArc({
+                        from:M,
+                        to:NPoint,
+                        context:context
+                    });
+                    
+                    ui.drawing();
+                    break; 
+                case 'SelectTool':
+                    context.clear();
+                    ui.move(NPoint);
                     break;
             }
         }
@@ -140,23 +154,26 @@ $(function(){
             case 'DrawLine':
                 changeCanvas(Cbox);
                 ui.draw();
+                uiList.push(ui);
                 //context.lineTo(NPoint.x,NPoint.y);
                 break;
             case 'DrawRect':
                 changeCanvas(Cbox);
                 ui.draw();
+                uiList.push(ui);
                 break;
             case 'StrokeRect':
                 changeCanvas(Cbox);
                 ui.draw();
+                uiList.push(ui);
                 break;
             case 'DrawArc':
                 changeCanvas(Cbox);
-                context.beginPath();
-                context.moveTo(M.x,M.y);
-                context.arc(M.x,M.y,Comger.Utility.getPointsDis(M,NPoint),0,Math.PI*2,true);
-                context.stroke();
-                context.closePath();
+                ui.draw();
+                break;
+            case 'SelectTool':
+                changeCanvas(Cbox);
+                ui.draw();
                 break;
                 
         }
@@ -169,8 +186,20 @@ $(function(){
         canvas = obj;
         context = canvas[0].getContext('2d');
         if(ui)
-            ui.getOpt().context = context;
+            ui.context = context;
     }
+    
+    //搜索点中形状
+    function findUI(point){
+        for(var i=0;i<uiList.length;i++){
+            if(uiList[i].inrange && uiList[i].inrange(point)) return uiList[i];
+        }
+        
+        return undefined;
+    }
+    
+    
+    
    
     //清除屏幕
     function clear(){

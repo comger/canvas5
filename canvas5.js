@@ -16,12 +16,8 @@
 **/
 
 var UI = Class({
-    opt:undefined,
-    getOpt:function(){
-        return opt;
-    },
     init:function(_opt){
-        opt = _opt;
+        $.extend(this,_opt);
     },
     draw:function(){
         //todo
@@ -30,35 +26,91 @@ var UI = Class({
         if(this.draw_move){
             this.draw_move();
         }
+    },
+    move:function(to){
+        //TODO
     }
 })
 
+/**
+ * 矩形
+ * new URect({
+      from:point,
+      to:point,
+      context:ctx,
+      isFill:true|false
+    })
+**/
 var URect = Class(UI,{
+    width:undefined,
+    height:undefined,
+    isFill:true,
+    context:undefined,
     draw:function(){
-        if(opt.isFill){
-            opt.context.fillRect(opt.from.x,opt.from.y,opt.to.x-opt.from.x,opt.to.y-opt.from.y);
+        if(this.width==undefined || this.height==undefined){
+           this.width = this.to.x - this.from.x;
+           this.height = this.to.y - this.from.y;
+        }
+        
+        if(this.isFill){
+            this.context.fillRect(this.from.x,this.from.y,this.width,this.height);
         }else{
-            opt.context.strokeRect(opt.from.x,opt.from.y,opt.to.x-opt.from.x,opt.to.y-opt.from.y);
+            this.context.strokeRect(this.from.x,this.from.y,this.width,this.height);
         }
     },
     draw_move:function(){
-        opt.context.dashRect(opt.from,opt.to);
+        this.context.dashRect(this.from,this.to);
+    },
+    inrange:function(point){
+        return this.from.x<=point.x && point.x<=(this.from.x+this.width) && this.from.y <= point.y && point.y<= (this.from.y+this.height);
+    },
+    move:function(to){
+        this.from = to;
+        this.draw();
+    },
+    clear:function(){
+        context.clearRect(this.from.x-1, this.from.y-1, this.width+2, this.height+2);
     }
 })
 
-
+/**
+ * 连接线
+ * new ULine({
+      from:point,
+      to:point,
+      context:ctx,
+    })
+**/
 var ULine = Class(UI,{
     draw:function(){
-        opt.context.moveTo(opt.from.x,opt.from.y);
-        opt.context.lineTo(opt.to.x,opt.to.y);
-        opt.context.stroke();
+        this.context.moveTo(this.from.x,this.from.y);
+        this.context.lineTo(this.to.x,this.to.y);
+        this.context.stroke();
     },
     draw_move:function(){
-        opt.context.beginPath();
-        opt.context.moveTo(opt.from.x,opt.from.y);
-        opt.context.lineTo(opt.to.x,opt.to.y);
-        opt.context.stroke();
-        opt.context.closePath();
+        this.context.beginPath();
+        this.context.moveTo(this.from.x,this.from.y);
+        this.context.lineTo(this.to.x,this.to.y);
+        this.context.stroke();
+        this.context.closePath();
+    }
+})
+
+/**
+ * 圆形
+ * new UArc({
+      from:point,
+      to:point,
+      context:ctx,
+    })
+**/
+var UArc = Class(UI,{
+    draw:function(){
+        this.context.beginPath();
+        this.context.moveTo(this.from.x,this.from.y);
+        this.context.arc(this.from.x,this.from.y,Comger.Utility.getPointsDis(this.from,this.to),0,Math.PI*2,true);
+        this.context.stroke();
+        this.context.closePath();
     }
 })
 
