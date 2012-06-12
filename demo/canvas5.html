@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>comger.js api rect demo</title>
+    <meta charset="utf-8">
+    <script src="../jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script src="../comger.js"></script>
+    <script src="../canvas5.js"></script>
+    <style>
+    .wrap{ width:1000px; margin:10px auto;text-align: left; font-size:12px; }
+    .footer { text-align:center; padding-top:30px; font-style: italic; clear:both; }
+    
+    .tools {padding:5px; border: 1px dotted #778855; background:#cccccc;}
+    .tools span{ margin:010px;}
+    .left,.main,.right{float:left; height:600px; background: none repeat scroll 0 0 #F5F5F5; border: 1px dotted #778855; margin:2px;padding:5px;}
+    .left {width:80px; }
+    .left h2{font-size:14px; margin:0px; }
+    .left ul{ padding:0px;}
+    .left li{ list-style:none; padding:5px; width:30%; float:left;}
+    .main {width:800px;  cursor: crosshair;}
+    .right {width:70px;}
+    .left li.hover{ color:red;}
+    canvas{ position: absolute; }
+
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="tools" >
+            <span>文件</span><span>选项</span><span>关于</span>
+        </div>
+        <div class="left">
+            <h2>工具栏</h2>
+            <ul>
+                <li val="SelectArea" class='hover'>选区</li>
+                <li val="DrawLine">画线</li>
+                <li val="DrawRect">矩形</li>
+                <li val="StrokeRect">边框</li>
+                <li val="DrawArc">画圆</li>
+                <li val="DrawText">文字</li>
+            </ul>
+        </div>
+        <div class="main" id='main'>
+            <canvas id="box" width='800' height='600'></canvas>
+            <canvas id="temp" width='800' height='600'></canvas>
+            <canvas id="bj" width='800' height='600'></canvas>
+        </div>
+        <div class="right">right</div>
+    </div>
+    <div class="footer">
+      get the source code on GitHub : <a href="https://github.com/comger/canvas5">comger/canvas5</a>
+    </div>
+</body>
+</html>
+
+<script>
+$(function(){
+   //工具选项
+    var op_select = 'SelectArea';
+
+    $(".left li").click(function(){
+        $(".left li").removeClass("hover");
+        $(this).addClass("hover");
+        op_select = $(this).attr('val');
+    });
+   
+    Cbox = $("#box"); 
+    Ctemp = $("#temp");
+    Cbj = $("#bj");
+    Main = $("#main");
+    canvas = Cbox;
+    context = canvas[0].getContext('2d');
+    M = undefined; //初始坐标
+    NPoint = undefined;
+    var linewidth = 5;
+    ui = undefined;
+   
+    Main.mousedown(function(e){
+        M = getCurPoint(e);
+        changeCanvas(Ctemp);
+        context.moveTo(M.x,M.y);
+    });
+    
+    
+    Main.mousemove(function(e){
+        if(M){
+            NPoint = getCurPoint(e);
+            switch(op_select){
+                case 'SelectArea':
+                    context.clear();
+                    context.dashRect(M,NPoint);
+                    break;
+                case 'DrawLine':
+                    context.clear();
+                    ui = new ULine({
+                        from:M,
+                        to:NPoint,
+                        context:context
+                    });
+                    ui.drawing();
+                    break;
+                case 'DrawRect':
+                    context.clear();
+                    ui = new URect({
+                        from:M,
+                        to:NPoint,
+                        context:context,
+                        isFill:true
+                    });
+                    ui.drawing();
+                    break;
+                case 'StrokeRect':
+                   context.clear();
+                    ui = new URect({
+                        from:M,
+                        to:NPoint,
+                        context:context,
+                        isFill:false
+                    });
+                    ui.drawing();
+                    break;
+                case 'DrawArc':
+                    context.clear();
+                    context.beginPath();
+                    context.moveTo(M.x,M.y);
+                    context.arc(M.x,M.y,Comger.Utility.getPointsDis(M,NPoint),0,Math.PI*2,true);
+                    context.stroke();
+                    context.closePath();
+                    break;
+            }
+        }
+
+    });
+    
+    
+    Main.mouseup(function(e){
+        switch(op_select){
+            case 'SelectArea':
+                changeCanvas(Cbox);
+                break;
+            case 'DrawLine':
+                changeCanvas(Cbox);
+                ui.draw();
+                //context.lineTo(NPoint.x,NPoint.y);
+                break;
+            case 'DrawRect':
+                changeCanvas(Cbox);
+                ui.draw();
+                break;
+            case 'StrokeRect':
+                changeCanvas(Cbox);
+                ui.draw();
+                break;
+            case 'DrawArc':
+                changeCanvas(Cbox);
+                context.beginPath();
+                context.moveTo(M.x,M.y);
+                context.arc(M.x,M.y,Comger.Utility.getPointsDis(M,NPoint),0,Math.PI*2,true);
+                context.stroke();
+                context.closePath();
+                break;
+                
+        }
+        
+        M = undefined;
+    });
+    
+    
+    function changeCanvas(obj){
+        canvas = obj;
+        context = canvas[0].getContext('2d');
+        if(ui)
+            ui.getOpt().context = context;
+    }
+   
+    //清除屏幕
+    function clear(){
+        context.setTransform(1, 0, 0, 1, 0, 0);//?? 关键
+        context.clearRect(0, 0, canvas.width(), canvas.height());
+    }
+
+    //获取相对坐标
+    function getCurPoint(e){
+        var _offset = canvas.offset();
+        return { x:(e.clientX + window.pageXOffset-_offset.left), y:(e.clientY + window.pageYOffset-_offset.top)};
+    }
+    
+    //画虚线矩形
+    function drawdashrect(from,to){
+           drawdashline(from,to,true);
+           drawdashline(from,to,false);
+           drawdashline(to,from,true);
+           drawdashline(to,from,false);
+    }
+
+    //画虚线
+    function drawdashline(from,to,flag){
+           var npointx;
+            var bar = 1;
+           if(flag){
+               var w = to.x - from.x
+                if(w<0){
+                    bar = -bar;
+                }
+               npointx = from.x;
+               w = getBigInt(w);
+               
+               for(var i=0;i<w/linewidth;i++){
+                    context.beginPath();
+                    context.moveTo(npointx,from.y);
+                    context.lineTo(npointx+linewidth*bar-2*bar,from.y);
+                    context.stroke();
+                    npointx = npointx +linewidth*bar;
+               }
+           }else{
+               var w = to.y - from.y;
+               if(w<0){
+                    bar = -bar;
+                }
+               npointx = from.y;
+               w = getBigInt(w);     
+               for(var i=0;i<w/linewidth;i++){
+                    context.beginPath();
+                    context.moveTo(from.x,npointx);
+                    context.lineTo(from.x, npointx+bar*linewidth-bar*2);
+                    context.stroke();
+                    npointx = npointx +bar*linewidth;
+               }
+           }
+     }
+     
+     function getBigInt(i){
+        if(i<0)
+            i = -i;
+        return i;
+    }
+
+   
+})
+</script>
