@@ -128,6 +128,7 @@ Comger.Utility = {
     }
 };
 
+window.Ga = Comger;
 window.Uti = Comger.Utility;
 window.Ga = Comger;
 
@@ -192,6 +193,71 @@ CanvasRenderingContext2D.prototype.dashRect = function(from,to){
 //清除屏幕
 CanvasRenderingContext2D.prototype.clear = function(){
     this.setTransform(1, 0, 0, 1, 0, 0);//?? 鍏抽敭
+    this.clearRect(0, 0, this.canvas.width, this.canvas.height);
+}
+
+
+
+/**
+ * 添加 Canvas.context.dashLine
+ *      Canvas.context.dashRect
+ *      Canvas.context.clear      
+ * from:开始位置, to:结束位置, flag:true 横向 false　竖向
+**/
+CanvasRenderingContext2D.prototype.dashLine = function(from,to,flag){
+    function getBigInt(i) {
+        if(i<0)
+            i = -i;
+        return i;
+    }
+    
+    var npointx;
+    var bar = 1;
+    var linewidth = 5;
+    
+    if(flag){
+        var w = to.x - from.x
+        if(w<0){
+            bar = -bar;
+        }
+        npointx = from.x;
+        w = getBigInt(w);
+
+        for(var i=0;i<w/linewidth;i++){
+            this.beginPath();
+            this.moveTo(npointx,from.y);
+            this.lineTo(npointx+linewidth*bar-2*bar,from.y);
+            this.stroke();
+            npointx = npointx +linewidth*bar;
+        }
+    }else{
+        var w = to.y - from.y;
+        if(w<0){
+            bar = -bar;
+        }
+        npointx = from.y;
+        w = getBigInt(w);     
+        for(var i=0;i<w/linewidth;i++){
+            this.beginPath();
+            this.moveTo(from.x,npointx);
+            this.lineTo(from.x, npointx+bar*linewidth-bar*2);
+            this.stroke();
+            npointx = npointx +bar*linewidth;
+        }
+    }
+}
+
+//画虚线矩形
+CanvasRenderingContext2D.prototype.dashRect = function(from,to){
+    this.dashLine(from,to,true);
+    this.dashLine(from,to,false);
+    this.dashLine(to,from,true);
+    this.dashLine(to,from,false);
+}
+
+//清屏幕
+CanvasRenderingContext2D.prototype.clear = function(){
+    this.setTransform(1, 0, 0, 1, 0, 0);//?? 关键
     this.clearRect(0, 0, this.canvas.width, this.canvas.height);
 }
 
@@ -344,10 +410,10 @@ Comger.Item = Class({
         this.visible = true;
     },
     hide:function(){
-        
+        this.visible = false;
     },
     setEnabled:function(flag){
-        
+        //todo del events
     },
     setToolTips:function(text){
         var tips = $("#canvas_tips");
@@ -376,7 +442,7 @@ Comger.Item = Class({
         return this.x<=point.x && point.x<=(this.x+this.width) && this.y <= point.y && point.y<= (this.y+this.height)
     },
     resize:function(){
-        
+        //todo
     },
     setDragEnabled:function(flag){
         this.dragActive = flag || this.dragActive;
@@ -580,6 +646,7 @@ Comger.Rect = Class(Comger.Item,{
         }else{
             this.context.stroke();
         }
+        
     },
     line:function(p1,p2){
 	    this.context.beginPath();
