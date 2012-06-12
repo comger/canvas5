@@ -30,12 +30,8 @@ var UI = Class({
         if(this.draw_move){
             this.draw_move();
         }
-    },
-    move:function(to){
-        //todo
     }
 })
-
 
 var URect = Class(UI,{
     draw:function(){
@@ -65,3 +61,4 @@ var ULine = Class(UI,{
         opt.context.closePath();
     }
 })
+
