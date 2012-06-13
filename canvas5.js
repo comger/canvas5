@@ -29,7 +29,8 @@ var UI = Class({
     },
     move:function(to){
         //TODO
-    }
+    },
+    
 })
 
 /**
@@ -67,6 +68,12 @@ var URect = Class(UI,{
     move:function(to){
         this.from = to;
         this.draw();
+        this.Super("move",arguments);
+    },
+    resize:function(to){
+           this.width = to.x - this.from.x;
+           this.height = to.y - this.from.y;
+           this.draw();
     },
     clear:function(){
         context.clearRect(this.from.x-1, this.from.y-1, this.width+2, this.height+2);
@@ -93,6 +100,12 @@ var ULine = Class(UI,{
         this.context.lineTo(this.to.x,this.to.y);
         this.context.stroke();
         this.context.closePath();
+    },
+    move:function(to){
+        
+    },
+    inrange:function(point){
+        
     }
 })
 
@@ -106,11 +119,38 @@ var ULine = Class(UI,{
 **/
 var UArc = Class(UI,{
     draw:function(){
+        if(this.r == undefined){
+            this.r = Comger.Utility.getPointsDis(this.from,this.to);
+        }
         this.context.beginPath();
         this.context.moveTo(this.from.x,this.from.y);
-        this.context.arc(this.from.x,this.from.y,Comger.Utility.getPointsDis(this.from,this.to),0,Math.PI*2,true);
+        this.context.arc(this.from.x,this.from.y,this.r,0,Math.PI*2,true);
         this.context.stroke();
         this.context.closePath();
+    },
+    move:function(to){
+        this.from = to;
+        this.draw();
+    },
+    draw_move:function(){
+        this.draw();
+    },
+    resize:function(to){
+        this.r = Comger.Utility.getPointsDis(this.from,to);
+        this.draw();
+    },
+    inrange:function(point){
+        var dis = Uti.getPointsDis(point,{x:this.from.x,y:this.from.y});
+        return dis<=this.r
+    },
+    clear:function(){
+        this.context.beginPath();
+        this.context.moveTo(this.from.x,this.from.y);
+        this.context.arc(this.from.x,this.from.y,this.r+2,0,Math.PI*2,true);
+        this.context.strokeStyle = "#ffffff";
+        this.context.stroke();
+        this.context.closePath();
+
     }
 })
 
