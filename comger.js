@@ -23,6 +23,10 @@ window.Class = Comger.Class = function(a,b){
             $.extend(_obj.prototype,a);
         }
         
+        _obj.prototype.Super = function(){//调用父类方法
+            this.__parentClass.prototype[arguments[0]].apply(this,arguments[1]);
+        }
+        
         return _obj;
     })());
     

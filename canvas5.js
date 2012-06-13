@@ -29,7 +29,8 @@ var UI = Class({
     },
     move:function(to){
         //TODO
-    }
+    },
+    
 })
 
 /**
@@ -67,6 +68,7 @@ var URect = Class(UI,{
     move:function(to){
         this.from = to;
         this.draw();
+        this.Super("move",arguments);
     },
     resize:function(to){
            this.width = to.x - this.from.x;
@@ -100,6 +102,9 @@ var ULine = Class(UI,{
         this.context.closePath();
     },
     move:function(to){
+        
+    },
+    inrange:function(point){
         
     }
 })

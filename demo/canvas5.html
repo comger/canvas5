@@ -6,6 +6,7 @@
     <script src="../jquery-1.7.1.min.js" type="text/javascript"></script>
     <script src="../comger.js"></script>
     <script src="../canvas5.js"></script>
+    <script src="../colorPicker.js"></script>
     <style>
     .wrap{ width:1000px; margin:10px auto;text-align: left; font-size:12px; }
     .footer { text-align:center; padding-top:30px; font-style: italic; clear:both; }
@@ -21,7 +22,9 @@
     .right {width:70px;}
     .left li.hover{ color:red;}
     canvas{ position: absolute; }
-
+    .cPSkin {z-index:99999;}
+    .cPClose {display:none;}
+    #SelectColor {width:50px; height:50px; border:0px solid #cccccc; margin:5px; padding:5px; font-size:10px}
     </style>
 </head>
 <body>
@@ -40,7 +43,7 @@
                 <li val="StrokeRect">边框</li>
                 <li val="DrawArc">画圆</li>
                 <li val="DrawText">文字</li>
-                <li val="SelectColor">Color</li>
+                <input id="SelectColor" onclick="colorPicker(event)"></input>
             </ul>
         </div>
         <div class="main" id='main'>
@@ -53,18 +56,33 @@
     <div class="footer">
       get the source code on GitHub : <a href="https://github.com/comger/canvas5">comger/canvas5</a>
     </div>
+    <div id="colorSelect" style="position: absolute; z-index: 999999; display:none">
+        <input id="colorval" onclick="colorPicker(event)"/>
+    </div>
 </body>
 </html>
 <script>
 $(function(){
    //工具选项
     var op_select = 'SelectArea';
+    SColor = "#000000"
 
     $(".left li").click(function(){
         $(".left li").removeClass("hover");
         $(this).addClass("hover");
         op_select = $(this).attr('val');
     });
+    
+    $(".cPClose").live('click',function(){
+        SColor = $("#SelectColor").val();
+        console.log(SColor);
+    });
+    
+    $("#SelectColor").click(function(){
+        SColor = $("#SelectColor").val();
+        console.log(SColor);
+    })
+
    
     Cbox = $("#box"); 
     Ctemp = $("#temp");
@@ -79,6 +97,9 @@ $(function(){
     uiList = [];
    
     Main.mousedown(function(e){
+        context.strokeStyle = SColor;
+        context.fillStyle = SColor;
+        
         M = getCurPoint(e);
         if(op_select=="SelectTool" || op_select == "Resize"){
             ui = findUI(M);
@@ -88,8 +109,9 @@ $(function(){
         
         changeCanvas(Ctemp);
         context.moveTo(M.x,M.y);
-        
     });
+    
+    
     
     
     Main.mousemove(function(e){
@@ -203,6 +225,8 @@ $(function(){
     function changeCanvas(obj){
         canvas = obj;
         context = canvas[0].getContext('2d');
+        context.strokeStyle = SColor;
+        context.fillStyle = SColor;
         if(ui)
             ui.context = context;
     }
@@ -216,71 +240,11 @@ $(function(){
         return undefined;
     }
     
-    
-    
-   
-    //清除屏幕
-    function clear(){
-        context.setTransform(1, 0, 0, 1, 0, 0);//?? 关键
-        context.clearRect(0, 0, canvas.width(), canvas.height());
-    }
-
     //获取相对坐标
     function getCurPoint(e){
         var _offset = canvas.offset();
         return { x:(e.clientX + window.pageXOffset-_offset.left), y:(e.clientY + window.pageYOffset-_offset.top)};
     }
-    
-    //画虚线矩形
-    function drawdashrect(from,to){
-           drawdashline(from,to,true);
-           drawdashline(from,to,false);
-           drawdashline(to,from,true);
-           drawdashline(to,from,false);
-    }
-
-    //画虚线
-    function drawdashline(from,to,flag){
-           var npointx;
-            var bar = 1;
-           if(flag){
-               var w = to.x - from.x
-                if(w<0){
-                    bar = -bar;
-                }
-               npointx = from.x;
-               w = getBigInt(w);
-               
-               for(var i=0;i<w/linewidth;i++){
-                    context.beginPath();
-                    context.moveTo(npointx,from.y);
-                    context.lineTo(npointx+linewidth*bar-2*bar,from.y);
-                    context.stroke();
-                    npointx = npointx +linewidth*bar;
-               }
-           }else{
-               var w = to.y - from.y;
-               if(w<0){
-                    bar = -bar;
-                }
-               npointx = from.y;
-               w = getBigInt(w);     
-               for(var i=0;i<w/linewidth;i++){
-                    context.beginPath();
-                    context.moveTo(from.x,npointx);
-                    context.lineTo(from.x, npointx+bar*linewidth-bar*2);
-                    context.stroke();
-                    npointx = npointx +bar*linewidth;
-               }
-           }
-     }
-     
-     function getBigInt(i){
-        if(i<0)
-            i = -i;
-        return i;
-    }
-
    
 })
 </script>
