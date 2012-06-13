@@ -30,6 +30,9 @@ var UI = Class({
     move:function(to){
         //TODO
     },
+    getStatus:function(){
+        return Uti.getPointsDis(this.from,this.to)>0;
+    }
     
 })
 
@@ -63,7 +66,12 @@ var URect = Class(UI,{
         this.context.dashRect(this.from,this.to);
     },
     inrange:function(point){
-        return this.from.x<=point.x && point.x<=(this.from.x+this.width) && this.from.y <= point.y && point.y<= (this.from.y+this.height);
+        if(this.width >0 && this.height>0){
+            return this.from.x<=point.x && point.x<=(this.from.x+this.width) && this.from.y <= point.y && point.y<= (this.from.y+this.height);
+
+        }else{
+            
+        }
     },
     move:function(to){
         this.from = to;
@@ -71,9 +79,9 @@ var URect = Class(UI,{
         this.Super("move",arguments);
     },
     resize:function(to){
-           this.width = to.x - this.from.x;
-           this.height = to.y - this.from.y;
-           this.draw();
+       this.width = to.x - this.from.x;
+       this.height = to.y - this.from.y;
+       this.draw();
     },
     clear:function(){
         context.clearRect(this.from.x-1, this.from.y-1, this.width+2, this.height+2);

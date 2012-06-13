@@ -90,29 +90,25 @@ $(function(){
     NPoint = undefined;
     var linewidth = 5;
     ui = undefined;
-
     uiList = [];
    
     Main.mousedown(function(e){
-        context.strokeStyle = SColor;
-        context.fillStyle = SColor;
-        
         M = getCurPoint(e);
+        changeCanvas(Cbox);
         if(op_select=="SelectTool" || op_select == "Resize"){
+            //移动或缩放时，先到box 移除当前ui
             ui = findUI(M);
-            if(ui) 
-                ui.clear();
+            if(ui){
+                ui.display = false;
+                reDraw();
+            }
         }
-        
-        changeCanvas(Ctemp);
-        context.moveTo(M.x,M.y);
     });
     
-    
-    
-    
+
     Main.mousemove(function(e){
         if(M){
+            changeCanvas(Ctemp);
             NPoint = getCurPoint(e);
             switch(op_select){
                 case 'SelectArea':
@@ -150,7 +146,6 @@ $(function(){
                     break;
                 case 'DrawArc':
                     context.clear();
-
                     ui = new UArc({
                         from:M,
                         to:NPoint,
@@ -161,13 +156,15 @@ $(function(){
                     break; 
                 case 'SelectTool':
                     if(ui && ui.move){
-                        context.clear();
+                        context.clear(); //temp 清除所有图形
+                        ui.context = context; //temp 实时绘制图片
                         ui.move(NPoint);
                     }
                     break;
                 case 'Resize':
                     if(ui && ui.resize){
                         context.clear();
+                        ui.context = context; //temp 实时绘制图片
                         ui.resize(NPoint);
                     }
                     break;
@@ -178,43 +175,7 @@ $(function(){
     
     
     Main.mouseup(function(e){
-        switch(op_select){
-            case 'SelectArea':
-                changeCanvas(Cbox);
-                break;
-            case 'DrawLine':
-                changeCanvas(Cbox);
-                ui.draw();
-                uiList.push(ui);
-                break;
-            case 'DrawRect':
-                changeCanvas(Cbox);
-                ui.draw();
-                uiList.push(ui);
-                break;
-            case 'StrokeRect':
-                changeCanvas(Cbox);
-                ui.draw();
-                uiList.push(ui);
-                break;
-            case 'DrawArc':
-                changeCanvas(Cbox);
-                ui.draw();
-                uiList.push(ui);
-                break;
-            case 'SelectTool':
-                changeCanvas(Cbox);
-                if(ui)
-                    ui.draw();
-                break;
-            case 'Resize':
-                changeCanvas(Cbox);
-                if(ui){
-                    ui.draw();
-                }
-                break;
-        }
-        
+        drawUI(); //在 box 绘制当前ui
         M = undefined;
     });
     
@@ -224,8 +185,6 @@ $(function(){
         context = canvas[0].getContext('2d');
         context.strokeStyle = SColor;
         context.fillStyle = SColor;
-        if(ui)
-            ui.context = context;
     }
     
     //搜索点中形状
@@ -241,6 +200,39 @@ $(function(){
     function getCurPoint(e){
         var _offset = canvas.offset();
         return { x:(e.clientX + window.pageXOffset-_offset.left), y:(e.clientY + window.pageYOffset-_offset.top)};
+    }
+    
+    //在box重绘所有图形
+    function reDraw(){
+        context.clear();
+        for(var i=0; i<uiList.length;i++){
+            if(uiList[i].display){
+                uiList[i].draw();
+            }
+        }
+        
+        changeCanvas(Ctemp);
+        context.clear();
+        
+    }
+    
+    //在box 绘制当前ui 
+    function drawUI(){
+        changeCanvas(Cbox);
+        if(ui && ui.getStatus()){
+            if(ui.index == undefined){
+                ui.display = true;
+                ui.context = context;
+                ui.index = uiList.length;
+                uiList.push(ui);
+                ui.draw();
+            }else{
+                uiList[ui.index].display = true;
+                uiList[ui.index].context = context;
+                reDraw();
+            }
+        }
+        
     }
    
 })

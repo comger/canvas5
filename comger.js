@@ -22,14 +22,11 @@ window.Class = Comger.Class = function(a,b){
         }else{
             $.extend(_obj.prototype,a);
         }
-<<<<<<< HEAD
-=======
-        
+
         _obj.prototype.Super = function(){//调用父类方法
             this.__parentClass.prototype[arguments[0]].apply(this,arguments[1]);
         }
-        
->>>>>>> f51457a0730db0675930ac97c8dd6564b498cd1c
+
         return _obj;
     })());
     
@@ -133,12 +130,16 @@ Comger.Utility = {
         (function(evn){
             self[startwith+evn] = function(fn){ self[evn].add(fn,self);};
         })(evn);
+    },
+    getPInt:function(i){ //获取正整数
+        if(i<0) i=-1;
+        return i;
     }
 };
 
 window.Ga = Comger;
 window.Uti = Comger.Utility;
-window.Ga = Comger;
+
 
 
 /**
