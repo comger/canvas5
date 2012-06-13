@@ -33,12 +33,14 @@
             <h2>工具栏</h2>
             <ul>
                 <li val="SelectTool" class='hover'>选择</li>
+                <li val="Resize">Resize</li>
                 <li val="SelectArea">选区</li>
                 <li val="DrawLine">画线</li>
                 <li val="DrawRect">矩形</li>
                 <li val="StrokeRect">边框</li>
                 <li val="DrawArc">画圆</li>
                 <li val="DrawText">文字</li>
+                <li val="SelectColor">Color</li>
             </ul>
         </div>
         <div class="main" id='main'>
@@ -80,7 +82,7 @@ $(function(){
    
     Main.mousedown(function(e){
         M = getCurPoint(e);
-        if(op_select=="SelectTool"){
+        if(op_select=="SelectTool" || op_select == "Resize"){
             ui = findUI(M);
             if(ui) 
                 ui.clear();
@@ -145,7 +147,12 @@ $(function(){
                         context.clear();
                         ui.move(NPoint);
                     }
-                    
+                    break;
+                case 'Resize':
+                    if(ui && ui.resize){
+                        context.clear();
+                        ui.resize(NPoint);
+                    }
                     break;
             }
         }
@@ -176,13 +183,19 @@ $(function(){
             case 'DrawArc':
                 changeCanvas(Cbox);
                 ui.draw();
+                uiList.push(ui);
                 break;
             case 'SelectTool':
                 changeCanvas(Cbox);
                 if(ui)
                     ui.draw();
                 break;
-                
+            case 'Resize':
+                changeCanvas(Cbox);
+                if(ui){
+                    ui.draw();
+                }
+                break;
         }
         
         M = undefined;
