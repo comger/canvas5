@@ -2,5 +2,6 @@
 mail: comger@gmail.com
 github: https://github.com/comger/canvas5
 blog: http://comger.github.com/canvas5/
+
 weibo: http://weibo.com/comger
 
